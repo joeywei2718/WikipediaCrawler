@@ -1,28 +1,20 @@
-
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-
 import java.io.IOException;
-import java.util.ArrayList;
 
-
+// Node class, represents one wikipedia page traversal. Contains information on the home website and the target first link
 public class Node {
-
     public String selfURL;
-
     public String selfTitle;
-
     public String firstURL;
-
     public String firstTitle;
-
-
 
     public Node(String url) {
 
         this.selfURL = url;
+        //Calls for traversal of site to find first link
         this.searchLink();
 
     }
@@ -32,6 +24,7 @@ public class Node {
     public String getFirstURL() {return this.firstURL;}
     public String getFirstTitle() {return this.firstTitle;}
 
+    // JSoup document crawling
     public void searchLink() {
 
         Document doc = null;
@@ -47,26 +40,26 @@ public class Node {
 
         assert doc != null;
 
-
+        // Finds wikipedia article title
         try {
             String title = doc.selectFirst(".mw-page-title-main").text();
             this.selfTitle = title;
         }
-
+        // For minor wikipedia articles
         catch (NullPointerException e) {
 
             String title = doc.selectFirst("#firstHeading").text();
             this.selfTitle = title;
         }
 
-
         Element body = doc.selectFirst("div.mw-body-content");
         assert body != null;
         Elements links = body.select("a");
 
-
+        // Parse through all links on website
         for (Element link : links) {
             Element parentTag = link.parent();
+            //Filter for desired a tag
             if (parentTag.tagName().equals("p") &&
                     !parentTag.parent().tagName().equals("td") &&
                     !link.attr("title").equals("Help:Pronunciation respelling key") &&
@@ -77,13 +70,10 @@ public class Node {
 
                 this.firstURL = url2;
                 this.firstTitle = text;
-                return;
-
+                return; //Break when first valid link is found
             }
         }
-
     }
-
 }
 
 
